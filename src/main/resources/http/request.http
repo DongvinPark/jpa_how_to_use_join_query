@@ -1,0 +1,12 @@
+### run
+GET http://localhost:8080/run/1000
+
+
+
+### join-run
+GET http://localhost:8080/join-run
+
+
+
+### join-run2
+GET http://localhost:8080/join-run2
