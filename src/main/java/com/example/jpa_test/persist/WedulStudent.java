@@ -33,7 +33,6 @@ public class WedulStudent {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wedul_classes_id")
-    @JsonBackReference
     private WedulClasses wedulClasses;
 
     private String studentName;

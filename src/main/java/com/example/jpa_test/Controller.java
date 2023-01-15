@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.dialect.function.TemplateRenderer;
 import org.springframework.data.domain.PageRequest;
@@ -51,6 +52,9 @@ public class Controller {
         @PathVariable Long idListLimit
     ){
 
+/*
+
+
 
         //MariaDB에 성공적으로 초기화를 마쳤으므로, ddl 설정을 none으로 바꾸고 초기화 코드도 전부 주석처리한다.
 
@@ -58,26 +62,26 @@ public class Controller {
         List<Long> followPKIdxList = new ArrayList<>();
         initList(followPKIdxList);
 
-        Set<Long> set = new HashSet<>();
+        Set<Long> randomIdxSet = new HashSet<>();
         for(int i=0; i<1000; i++){
-            set.add(followPKIdxList.get(i));
+            randomIdxSet.add(followPKIdxList.get(i));
         }
 
-        long followTargetPK = 1;
+        long targetIdx = 1;
 
         //팔로우 테이블에 5천 개의 팔로우 관계 튜플을 넣는다.
         //주키는 직접 매핑한다.
         //1001번 유저는 1~1000 번의 유저들을 팔로우하고 있는 것이다.
         for(long i=1; i<=5000; i++){
-            if(set.contains(i)){
+            if(randomIdxSet.contains(i)){
                 followRepository.save(
                     FollowEntity.builder()
                         .id(i)
                         .followSentUserPKId(1001L)
-                        .followTargetUserPKId(followTargetPK)
+                        .followTargetUserPKId(targetIdx)
                         .build()
                 );
-                followTargetPK++;
+                targetIdx++;
             }//if
             else{
                 followRepository.save(
@@ -91,18 +95,20 @@ public class Controller {
         }
 
 
-        followTargetPK = 1;
 
         //투두 테이블을 셋팅한다.
-        //그 중에서 set에 들어 있는 놈들은 특별 취급한다. 셋에 있다는 것은 1001번 유저가 팔로우한 유저라는
-        //뜻이고, 그 경우 투두 아이템의 authorUserPkId 필드를 1~1000 번까지 셋팅될 수 있게 해야 한다.
+        //팔로우 엔티티에 매핑된 두 개의 투두 아이템을 만드는 작업을 1000번 반복한다.
         //
-        for(long i=0; i<=5000; i++){
-            if(set.contains(i)){
+        for(long j=1; j<=1000; j++) {
+                FollowEntity followRelationEntity = followRepository.findByFollowSentUserPKIdEqualsAndFollowTargetUserPKIdEquals(
+                        1001L, j)
+                    .orElseThrow(() -> new RuntimeException("follow entity not found"));
+
                 //트루인 경우를 저장한다.
                 todoRepository.save(
                     TodoEntity.builder()
-                        .authorUserPKId(followTargetPK)
+                        .authorUserPKId(j)
+                        .followEntity(followRelationEntity)
                         .finished(true)
                         .build()
                 );
@@ -110,68 +116,74 @@ public class Controller {
                 //펄스인 경우를 저장한다.
                 todoRepository.save(
                     TodoEntity.builder()
-                        .authorUserPKId(followTargetPK)
+                        .authorUserPKId(j)
+                        .followEntity(followRelationEntity)
                         .finished(false)
                         .build()
                 );
-                followTargetPK++;
-            }
-            else{
-                //그냥 의미 없는 값으로 저장한다.
-                todoRepository.save(
-                    TodoEntity.builder()
-                        .authorUserPKId(0L)
-                        .finished(false)
-                        .build()
-                );
-            }
-        }//for
+        }// 1000 for
+
+
+        //나머지 4000개의 튜플을 아무 의미 없는 값으로 집어 넣는다.
+        for(long k=1; k<=4000; k++){
+            todoRepository.save(
+                TodoEntity.builder()
+                    .authorUserPKId(0L)
+                    .followEntity(null)
+                    .finished(false)
+                    .build()
+            );
+        }
+
+*/
 
 
 
-        //쿼리 작성 시간을 측정한다.
+        //쿼리 실행 시간을 측정한다.
+
+
+        //두 번째는 조인 쿼리다.
+        //DB 입출력은 1번만 발생하지만, N+1 문제를 신경써야 한다.
+        Long start2 = System.currentTimeMillis();
+        Slice<TodoEntity> secondQueryResult = todoRepository.findAllTodoEntitys(PageRequest.of(0,30), 1001L);
+        Long end2 = System.currentTimeMillis();
+
+        System.out.println("조인 쿼리 1개 : " + (end2-start2) + " 밀리 초");
+        System.out.println("secondQueryResult.getContent().size() = " + secondQueryResult.getContent().size());
+
+        for(TodoEntity entity : secondQueryResult){
+            System.out.println(entity.getAuthorUserPKId() + "/" + entity.isFinished());
+        }
+
 
         //첫 번째는 단순 쿼리 2 개다.
         //5001 번 유저가 팔로우 하고 있는 다른 유저들 5천 명(1~5000번 유저)을 찾은 다음,
         //투두 엔티티에서 1~5000번 유저들이 올린 투두 들 중에서 finished 가 false인 것만 페이징 처리하여 골라내는 것이다.
         //DB 입출력이 2번 발생하지만 N+1문제는 절대 발상하지 않음을 보장한다.
 
-        List<Long> cachedIdList = new ArrayList<>();
+        /*List<Long> cachedIdList = new ArrayList<>();
         for(long i=1; i<=idListLimit; i++){
             cachedIdList.add(i);
         }
 
-        Collections.shuffle(cachedIdList);
+        Collections.shuffle(cachedIdList);*/
 
         Long start1 = System.currentTimeMillis();
-        //첫 번째 단순 쿼리
-        //List<Long> idList = followRepository.findAllByFollowSentUserPKId(1001L).stream().map(FollowEntity::getFollowTargetUserPKId).collect(Collectors.toList());
+        //특정 유저가 팔로우한 다른 유저들의 주키 아이디 번호를 알아내기 위한 첫 번째 단순 쿼리
+        List<Long> idList = followRepository.findAllByFollowSentUserPKId(1001L).stream().map(FollowEntity::getFollowTargetUserPKId).collect(
+            Collectors.toList());
 
-        //두 번째 단순 쿼리
-        List<TodoEntity> todoEntities = todoRepository.findAllByFinishedIsFalseAndAuthorUserPKIdIn(PageRequest.of(0, 30), cachedIdList).getContent();
+        //두 번째 단순 쿼리. 첫 번째 단쉰 쿼리의 결과물은 캐시된 것을 건네는 것으로 대체한다.
+        List<TodoEntity> todoEntities = todoRepository.findAllByFinishedIsFalseAndAuthorUserPKIdIn(PageRequest.of(0, 30), idList).getContent();
         Long end1 = System.currentTimeMillis();
 
         System.out.println("단순 쿼리 2개 : " + (end1-start1) + " 밀리 초");
-        System.out.println("idList.size() = " + cachedIdList.size());
+        System.out.println("idList.size() = " + idList.size());
         System.out.println("todoEntities size() = " + todoEntities.size());
 
         //최종 결과물 출력. 작성자 아이디는 1~30 이렇게 총 30개가 나와야 하고, 각각의 내용물을 전부 false여야 한다.
         for(TodoEntity todoEntity : todoEntities){
             System.out.println(todoEntity.getAuthorUserPKId() + "/" + todoEntity.isFinished());
-        }
-
-        //두 번째는 조인 쿼리다.
-        //DB 입출력은 1번만 발생하지만, N+1 문제를 신경써야 한다.
-        Long start2 = System.currentTimeMillis();
-        Slice<FollowEntity> secondQueryResult = followRepository.findAllWithTodoEntity(PageRequest.of(0,30));
-        Long end2 = System.currentTimeMillis();
-
-        System.out.println("조인 쿼리 1개 : " + (end2-start2) + " 밀리 초");
-        System.out.println("secondQueryResult.getContent().size() = " + secondQueryResult.getContent().size());
-
-        for(FollowEntity entity : secondQueryResult){
-            //System.out.println(entity.getAuthorUserPKId() + "/" + entity.isFinished());
-            System.out.println(entity.getTodoEntityList().size());
         }
 
     }//end of run func
@@ -188,7 +200,6 @@ public class Controller {
     @GetMapping("join-run")
     public void joinTest(){
 
-/*
 
         //클래스 테이블 초기화
         wedulClassesRepository.save(
@@ -264,7 +275,7 @@ public class Controller {
                 .studentType(StudentType.STUDENT)
                 .build()
         );
-*/
+
 
         //조인 쿼리 결과물 생성
         //List<WedulClasses> result = wedulClassesRepository.findAllWithStudent();
