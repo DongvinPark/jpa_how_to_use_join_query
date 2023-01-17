@@ -1,7 +1,10 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.io.Serializable;
@@ -31,9 +34,14 @@ public class JwtCacheRepository implements Serializable {
     @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration JWT_DURATION = Duration.ofDays(7);
 
-    public void setJwt(String jwt, Long userPKId){
+    public void setJwt(String jwt, Long userPKId) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String durationString = objectMapper.writeValueAsString(JWT_DURATION);
+
         String key = getKey(userPKId);
-        template.opsForValue().set(key, jwt, JWT_DURATION);
+        template.opsForValue().set(key, jwt, Duration.parse(durationString));
         log.info("레디스에 유저 jwt 셋팅 완료.");
     }
 

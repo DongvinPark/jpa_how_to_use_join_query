@@ -1,7 +1,10 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.io.Serializable;
@@ -36,10 +39,17 @@ public class FolloweeCacheRepository implements Serializable {
 
     //최초로 로그인 했다. DB로부터 특정 유저가 팔로우한 사람들의 주키 아이디 값 리스트를 받아서 레디스에 저장한다.
     //리스트에 더하는 작업은 5000번을 초과할 수 없다.
-    public void setFolloweeList(List<Long> pkIdList, Long userPKId){
+    public void setFolloweeList(List<Long> pkIdList, Long userPKId) throws JsonProcessingException {
+
+        log.info("팔로이 리스트 셋팅 진입");
+        log.info("듀레이션 셋팅 시작");
         String key = getKey(userPKId);
+        template.opsForValue().set(key, 0, LIST_DURATION);
+        log.info("듀레이션으로 만료 기간 셋팅 완료.");
+
         for(Long id : pkIdList){
-            template.opsForList().rightPush(key, id, LIST_DURATION);
+            log.info("레디스 리스트 값 삽입 : " + id);
+            template.opsForList().rightPush(key, id);
         }
         log.info("레디스에 팔로이 리스트 캐시 완료.");
     }

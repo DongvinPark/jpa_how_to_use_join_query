@@ -18,6 +18,7 @@ import com.example.jpa_test.redis_repository.FolloweeCacheRepository;
 import com.example.jpa_test.redis_repository.JwtCacheRepository;
 import com.example.jpa_test.redis_repository.NagCacheRepository;
 import com.example.jpa_test.redis_repository.SupportCacheRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.dialect.function.TemplateRenderer;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class Controller {
 
     private final FollowRepository followRepository;
@@ -361,10 +364,9 @@ public class Controller {
 
 
     @GetMapping("/redis-test-run")
-    public void redisTest(){
+    public void redisTest() throws JsonProcessingException {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+        log.info("레디스 컨트롤러 테스트 메서드 진입");
 
         List<Long> pkIdListFromDataBase = new ArrayList<>();
         pkIdListFromDataBase.add(1L);
