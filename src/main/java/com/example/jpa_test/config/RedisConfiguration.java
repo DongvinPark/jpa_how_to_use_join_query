@@ -29,9 +29,9 @@ public class RedisConfiguration {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(){
-        RedisURI redisURI = RedisURI.create(redisProperties.getUrl());
-        org.springframework.data.redis.connection.RedisConfiguration configuration = LettuceConnectionFactory.createRedisConfiguration(redisURI);
-        LettuceConnectionFactory factory = new LettuceConnectionFactory(configuration);
+        /*RedisURI redisURI = RedisURI.create(redisProperties.getUrl());
+        org.springframework.data.redis.connection.RedisConfiguration configuration = LettuceConnectionFactory.createRedisConfiguration(redisURI);*/
+        LettuceConnectionFactory factory = new LettuceConnectionFactory("여기에 레디스 엔드포인트 직접 넣으라", 6379);
         factory.afterPropertiesSet();
         return factory;
     }

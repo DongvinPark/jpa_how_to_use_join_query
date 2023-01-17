@@ -11,7 +11,3 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
-
-  redis:
-    url: sicial-todo-backend-redis.t5atgo.ng.0001.apn2.cache.amazonaws.com
-    port: 6379
