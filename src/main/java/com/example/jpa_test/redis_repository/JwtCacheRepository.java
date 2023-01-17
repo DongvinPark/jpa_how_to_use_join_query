@@ -5,14 +5,19 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.time.Duration;
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@MappedSuperclass
+@EntityListeners(value = {AuditingEntityListener.class})
 public class JwtCacheRepository {
     //레디스에서 제공하는 기능들을 간편하게 호출할 수 있게 만들어주는 클래스다.
 

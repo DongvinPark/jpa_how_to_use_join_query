@@ -8,14 +8,19 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@MappedSuperclass
+@EntityListeners(value = {AuditingEntityListener.class})
 public class FolloweeCacheRepository {
 
     private final RedisTemplate<String, Object> template;
