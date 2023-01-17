@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
+import java.io.Serializable;
 import java.time.Duration;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 @MappedSuperclass
 @EntityListeners(value = {AuditingEntityListener.class})
-public class NagCacheRepository {
+public class NagCacheRepository implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final RedisTemplate<String, Object> template;
 

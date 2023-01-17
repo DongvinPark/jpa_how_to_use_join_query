@@ -18,6 +18,8 @@ import com.example.jpa_test.redis_repository.FolloweeCacheRepository;
 import com.example.jpa_test.redis_repository.JwtCacheRepository;
 import com.example.jpa_test.redis_repository.NagCacheRepository;
 import com.example.jpa_test.redis_repository.SupportCacheRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -360,6 +362,10 @@ public class Controller {
 
     @GetMapping("/redis-test-run")
     public void redisTest(){
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
         List<Long> pkIdListFromDataBase = new ArrayList<>();
         pkIdListFromDataBase.add(1L);
         pkIdListFromDataBase.add(2L);
