@@ -2,6 +2,8 @@ package com.example.jpa_test;
 
 import com.example.jpa_test.persist.FollowEntity;
 import com.example.jpa_test.persist.FollowRepository;
+import com.example.jpa_test.persist.TestEntity;
+import com.example.jpa_test.persist.TestRepository;
 import com.example.jpa_test.persist.TodoEntity;
 import com.example.jpa_test.persist.TodoRepository;
 import com.example.jpa_test.persist.WedulClasses;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,6 +39,7 @@ public class Controller {
     private final WedulStudentRepository wedulStudentRepository;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
+    private final TestRepository testRepository;
 
     /**
      * 본 코드는 두 개의 테이블을 조인하여 한 번의 쿼리로 작업을 끝내는 것과,
@@ -193,14 +197,8 @@ public class Controller {
 
 
 
-
-
-    //----------- PRIVATE HELPER METHODS -----------
-
     @GetMapping("join-run")
     public void joinTest(){
-
-
         //클래스 테이블 초기화
         wedulClassesRepository.save(
             WedulClasses.builder()
@@ -324,6 +322,33 @@ public class Controller {
             System.out.println(m.getTeam());
         });
     }
+
+
+
+
+
+    @GetMapping("/entity-set-test-run")
+    public void entitySetTestRun(
+        @RequestBody TestEntity inputEntity
+    ){
+        TestEntity entity1 = testRepository.save(
+            TestEntity.builder()
+                .nickName("dongvin")
+                .build()
+        );
+
+        System.out.println("entity1.hashCode() = " + entity1.hashCode());
+
+        entity1.setNickName("DongvinPark");
+
+    }//func
+
+
+
+
+
+
+    //----------- PRIVATE HELPER METHODS -----------
 
 
 
