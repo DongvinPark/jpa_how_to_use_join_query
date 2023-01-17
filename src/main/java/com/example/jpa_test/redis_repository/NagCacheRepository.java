@@ -1,5 +1,9 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +20,8 @@ public class NagCacheRepository {
     //이 부분이 문제다. 레디스 캐시에만 잔소리/서포트를 기록하면 서비스가 운영될수록
     //캐시서버에 기록이 계속 누적되는 것이다.
     //때문에 누적된 캐시기록들을 1일 단위로 매일 새벽 2~6시마다 어제의 캐시 기록들을 DB에 영구저장하는 것이 필요할 것이다.
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
 
 

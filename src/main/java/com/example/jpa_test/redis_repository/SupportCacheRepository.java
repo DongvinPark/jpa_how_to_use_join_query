@@ -1,5 +1,9 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +15,10 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class SupportCacheRepository {
     private final RedisTemplate<String, Object> template;
+
+    //임시로 3일이라 하자.
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
 
 

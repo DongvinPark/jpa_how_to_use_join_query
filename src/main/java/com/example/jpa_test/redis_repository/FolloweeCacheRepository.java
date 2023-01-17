@@ -1,5 +1,9 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +21,8 @@ public class FolloweeCacheRepository {
     private final RedisTemplate<String, Object> template;
 
     //이것은 값이 큰 편이므로 캐시에서 저장되는 유효기간을 짧게 설정한다.
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration LIST_DURATION = Duration.ofDays(1);
 
 

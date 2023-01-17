@@ -1,5 +1,9 @@
 package com.example.jpa_test.redis_repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +17,10 @@ public class JwtCacheRepository {
     //레디스에서 제공하는 기능들을 간편하게 호출할 수 있게 만들어주는 클래스다.
 
     private final RedisTemplate<String, String> template;
+
     //임시로 1주일이라고 하자.
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration JWT_DURATION = Duration.ofDays(7);
 
     public void setJwt(String jwt, Long userPKId){
