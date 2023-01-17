@@ -24,7 +24,7 @@ import org.springframework.stereotype.Repository;
 public class SupportCacheRepository implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private final RedisTemplate<String, Object> template;
+    private final RedisTemplate<String, Long> template;
 
     //임시로 3일이라 하자.
     @JsonSerialize(using = DurationSerializer.class)
@@ -35,7 +35,7 @@ public class SupportCacheRepository implements Serializable {
     //응원 숫자를 레디스로부터 가져온다.
     public Long getSupportNumber(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
-        Long value = (Long) template.opsForValue().get(key);
+        Long value = template.opsForValue().get(key);
         log.info("레디스로부터 응원 숫자 가져오기 완료.");
         return value;
     }
@@ -52,7 +52,7 @@ public class SupportCacheRepository implements Serializable {
     public void plusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = (Long) template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().get(key);
 
         prevNumber++;
 
@@ -64,7 +64,7 @@ public class SupportCacheRepository implements Serializable {
     public void minusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = (Long) template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().get(key);
 
         prevNumber--;
 

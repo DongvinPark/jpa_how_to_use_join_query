@@ -26,7 +26,7 @@ public class NagCacheRepository implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final RedisTemplate<String, Object> template;
+    private final RedisTemplate<String, Long> template;
 
     //이 부분이 문제다. 레디스 캐시에만 잔소리/서포트를 기록하면 서비스가 운영될수록
     //캐시서버에 기록이 계속 누적되는 것이다.
@@ -39,18 +39,14 @@ public class NagCacheRepository implements Serializable {
     //잔소리 숫자를 레디스로부터 가져온다.
     public Long getSupportNumber(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
-        Long value = (Long) template.opsForValue().get(key);
+        Long value = template.opsForValue().get(key);
         log.info("레디스로부터 잔소리 숫자 가져오기 완료");
         return value;
     }
 
 
     //최초의 잔소리에 대하여 캐싱한다.
-    public void setInitialNag(Long publicTodoPKId) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String durationString = objectMapper.writeValueAsString(NAG_NUMBER_DURATION);
+    public void setInitialNag(Long publicTodoPKId) {
 
         String key = getKey(publicTodoPKId);
         template.opsForValue().set(key, 1L, NAG_NUMBER_DURATION);
@@ -61,7 +57,7 @@ public class NagCacheRepository implements Serializable {
     public void plusOneNag(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = (Long) template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().get(key);
 
         prevNumber++;
 
@@ -73,7 +69,7 @@ public class NagCacheRepository implements Serializable {
     public void minusOneNag(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = (Long) template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().get(key);
 
         prevNumber--;
 

@@ -63,8 +63,8 @@ public class RedisConfiguration {
     //리스트 관련 시리얼라이저일 필요는 없다.
     @Bean
     @Primary
-    public RedisTemplate<String, Object> makeStringObjectListRedisTemplate(RedisConnectionFactory redisConnectionFactory){
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Long> makeStringObjectListRedisTemplate(RedisConnectionFactory redisConnectionFactory){
+        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         //Object는 객체타입이므로 new Jackson2JsonRedisSerializer<Long>(Long.class)를 사용한다.

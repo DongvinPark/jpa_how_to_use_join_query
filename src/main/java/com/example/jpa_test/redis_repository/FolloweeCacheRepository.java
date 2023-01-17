@@ -23,17 +23,11 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@MappedSuperclass
-@EntityListeners(value = {AuditingEntityListener.class})
-public class FolloweeCacheRepository implements Serializable {
+public class FolloweeCacheRepository {
 
-    private static final long serialVersionUID = 1L;
-
-    private final RedisTemplate<String, Object> template;
+    private final RedisTemplate<String, Long> template;
 
     //이것은 값이 큰 편이므로 캐시에서 저장되는 유효기간을 짧게 설정한다.
-    @JsonSerialize(using = DurationSerializer.class)
-    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration LIST_DURATION = Duration.ofDays(1);
 
 
@@ -44,7 +38,7 @@ public class FolloweeCacheRepository implements Serializable {
         log.info("팔로이 리스트 셋팅 진입");
         log.info("듀레이션 셋팅 시작");
         String key = getKey(userPKId);
-        template.opsForValue().set(key, 0, LIST_DURATION);
+        template.opsForValue().set(key, 0L, LIST_DURATION);
         log.info("듀레이션으로 만료 기간 셋팅 완료.");
 
         for(Long id : pkIdList){
