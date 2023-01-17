@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -38,6 +39,7 @@ public class RedisConfiguration {
 
     //유저의 jwt 토큰을 저장해 둘 레디스 템플릿을 빈으로 만들어준다.
     @Bean
+    @Primary
     public RedisTemplate<String, String> makeUserJwtRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         //템플릿을 만들어서 설정값을 붙여준다.
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
@@ -60,6 +62,7 @@ public class RedisConfiguration {
     //저장되는 값 타입이 Object일지라도, 레디스템플릿 자치에서 리스트 동작을 지원하기 때문에 값 부분 시리얼라이저가
     //리스트 관련 시리얼라이저일 필요는 없다.
     @Bean
+    @Primary
     public RedisTemplate<String, Object> makeStringObjectListRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
