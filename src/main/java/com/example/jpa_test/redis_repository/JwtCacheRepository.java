@@ -20,28 +20,18 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@MappedSuperclass
-@EntityListeners(value = {AuditingEntityListener.class})
 public class JwtCacheRepository implements Serializable {
     //레디스에서 제공하는 기능들을 간편하게 호출할 수 있게 만들어주는 클래스다.
-
-    private static final long serialVersionUID = 1L;
 
     private final RedisTemplate<String, String> template;
 
     //임시로 1주일이라고 하자.
-    @JsonSerialize(using = DurationSerializer.class)
-    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration JWT_DURATION = Duration.ofDays(7);
 
-    public void setJwt(String jwt, Long userPKId) throws JsonProcessingException {
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String durationString = objectMapper.writeValueAsString(JWT_DURATION);
+    public void setJwt(String jwt, Long userPKId) {
 
         String key = getKey(userPKId);
-        template.opsForValue().set(key, jwt, Duration.parse(durationString));
+        template.opsForValue().set(key, jwt, JWT_DURATION);
         log.info("레디스에 유저 jwt 셋팅 완료.");
     }
 

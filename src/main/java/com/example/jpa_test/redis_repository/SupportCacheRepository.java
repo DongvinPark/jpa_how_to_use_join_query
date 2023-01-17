@@ -19,16 +19,10 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@MappedSuperclass
-@EntityListeners(value = {AuditingEntityListener.class})
-public class SupportCacheRepository implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class SupportCacheRepository {
     private final RedisTemplate<String, Long> template;
 
     //임시로 3일이라 하자.
-    @JsonSerialize(using = DurationSerializer.class)
-    @JsonDeserialize(using = DurationDeserializer.class)
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
 
 
