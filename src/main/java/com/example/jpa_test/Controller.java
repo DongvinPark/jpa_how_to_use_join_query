@@ -14,6 +14,10 @@ import com.example.jpa_test.persist2.Member;
 import com.example.jpa_test.persist2.MemberRepository;
 import com.example.jpa_test.persist2.Team;
 import com.example.jpa_test.persist2.TeamRepository;
+import com.example.jpa_test.redis_repository.FolloweeCacheRepository;
+import com.example.jpa_test.redis_repository.JwtCacheRepository;
+import com.example.jpa_test.redis_repository.NagCacheRepository;
+import com.example.jpa_test.redis_repository.SupportCacheRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,6 +44,11 @@ public class Controller {
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final TestRepository testRepository;
+
+    private final FolloweeCacheRepository followeeCacheRepository;
+    private final JwtCacheRepository jwtCacheRepository;
+    private final NagCacheRepository nagCacheRepository;
+    private final SupportCacheRepository supportCacheRepository;
 
     /**
      * 본 코드는 두 개의 테이블을 조인하여 한 번의 쿼리로 작업을 끝내는 것과,
@@ -342,6 +351,32 @@ public class Controller {
         entity1.setNickName("DongvinPark");
 
     }//func
+
+
+
+
+
+
+
+    @GetMapping("/redis-test-run")
+    public void redisTest(){
+        List<Long> pkIdListFromDataBase = new ArrayList<>();
+        pkIdListFromDataBase.add(1L);
+        pkIdListFromDataBase.add(2L);
+        pkIdListFromDataBase.add(3L);
+
+        followeeCacheRepository.setFolloweeList(pkIdListFromDataBase, 0L);
+        System.out.println("레디스에서 팔로이 리스트 가져오기 컨트롤러 측 : " + followeeCacheRepository.getFolloweeList(0L));
+
+        supportCacheRepository.setInitialSupport(5L);
+        supportCacheRepository.plusOneSupport(5L);
+        supportCacheRepository.minusOneSupport(5L);
+        System.out.println("레디스에서 응원 개수 가져오기 컨트롤러 측 : " + supportCacheRepository.getSupportNumber(5L));
+
+        jwtCacheRepository.setJwt("this is jwt", 7L);
+        System.out.println("레디스에서 7L번 유저의 jwt 가져오기 컨트롤러 측 : " + jwtCacheRepository.getJwt(7L));
+
+    }
 
 
 
