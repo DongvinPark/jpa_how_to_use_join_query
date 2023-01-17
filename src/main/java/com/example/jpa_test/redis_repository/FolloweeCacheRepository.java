@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class FolloweeCacheRepository {
 
-    private final RedisTemplate<String, Long> template;
+    private final RedisTemplate<String, Object> template;
 
     //이것은 값이 큰 편이므로 캐시에서 저장되는 유효기간을 짧게 설정한다.
     private static final Duration LIST_DURATION = Duration.ofDays(1);
@@ -43,26 +43,26 @@ public class FolloweeCacheRepository {
 
         for(Long id : pkIdList){
             log.info("레디스 리스트 값 삽입 : " + id);
-            template.opsForList().rightPush(key, id);
+            template.opsForList().rightPush(key, String.valueOf(id));
         }
         log.info("레디스에 팔로이 리스트 캐시 완료.");
     }
 
 
     //레디스로부터 특정 유저가 팔로우한 사람들의 리스트를 가져온다.
-    public List<Long> getFolloweeList(Long userPKId){
+    public List<String> getFolloweeList(Long userPKId){
         log.info("레디스 리스트 겟 진입");
         String key = getKey(userPKId);
 
         long size = template.opsForList().size(key);
 
-        List<Long> listFromRedis = template.opsForList().range(key, 0, size);
+        List<Object> listFromRedis = template.opsForList().range(key, 0, size);
 
         log.info("레디스로부터 리스트 가져오기 완료. Expire 설정은 나중에한다.");
 
-        List<Long> resultList = new ArrayList<>();
-        for(Long longObject : listFromRedis){
-            resultList.add( longObject );
+        List<String> resultList = new ArrayList<>();
+        for( Object longObject : listFromRedis){
+            resultList.add((String) longObject);
         }
 
         log.info("레디스로부터 팔로우 리스트 리턴 완료.");
