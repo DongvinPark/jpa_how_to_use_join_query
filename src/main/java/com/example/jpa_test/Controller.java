@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,76 +24,53 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class Controller {
 
-    private final com.example.jpa_test.KafkaProducer kafkaProducer;
 
 
+    @PostMapping("/peter-topic-produce")
+    public void peterTopicSend(){
+        Properties props = new Properties();
+        props.put("bootstrap.server", "여기에 내 부트스트랩 스트링 넣어라");
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
+        log.info("샌드 프로퍼티 설정 완료");
 
-    @PostMapping("/kafka-run")
-    public String sendMsg(
-        @RequestParam String message
-    ){
-        kafkaProducer.sendMessage(message);
-        return "카프카 메시지 전송 성공";
+        Producer<String, String> producer = new KafkaProducer<String, String>(props);
+        producer.send(new ProducerRecord<>("peter-topic", "하나"));
+        producer.send(new ProducerRecord<>("peter-topic", "둘"));
+        producer.send(new ProducerRecord<>("peter-topic", "셋"));
+        producer.close();
+
+        log.info("토픽에 메시지 보내기 완료.");
     }
 
 
 
 
+    @GetMapping("/peter-topic-consume")
+    public void peterTopicReceive(){
+        Properties props = new Properties();
+        props.put("bootstrap.servers","여기에 내 부트스트랩 문자열 넣어라");
+        props.put("group.id","peter-consumer");
+        props.put("enable.auto.commit","true");
+        props.put("auto.offset.reset","latest");
+        props.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
 
-    @GetMapping("/kafka-producer-run")
-    public void connectKafkaProducer(){
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+        consumer.subscribe(Arrays.asList("peter-topic"));
 
-        final String TOPIC = "msk_test";
-
-        Properties configs = new Properties();
-        configs.put("bootstrap.servers", "b-2.soicaltodobackend.2f4dqe.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.soicaltodobackend.2f4dqe.c2.kafka.ap-northeast-2.amazonaws.com:9092");
-        configs.put("acks", "all");
-        configs.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        configs.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
-        KafkaProducer<String, String> producer = new KafkaProducer<String, String>(configs);
-
-        for(int i=0; i<5; i++){
-            String message = "hello" + i;
-            producer.send(new ProducerRecord<>(TOPIC, message));
-        }
-
-        producer.flush();
-        producer.close();
-
-    }//end of connectKafka
-
-
-
-
-
-
-    @GetMapping("/kafka-consumer-run")
-    public void connectKafkaConsumer(){
-
-        final String TOPIC = "msk_test";
-
-        Properties configs = new Properties();
-        configs.put("bootstrap.servers", "b-2.soicaltodobackend.2f4dqe.c2.kafka.ap-northeast-2.amazonaws.com:9092,b-1.soicaltodobackend.2f4dqe.c2.kafka.ap-northeast-2.amazonaws.com:9092");
-        configs.put("acks", "all");
-        configs.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        configs.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(configs);
-
-        consumer.subscribe(Arrays.asList(TOPIC));
-
-        boolean stopper = false;
-        while(!stopper){
-            ConsumerRecords<String, String> records = consumer.poll(500);
-            for(ConsumerRecord<String, String> record : records){
-                System.out.println("record.value() = " + record.value());
+        try{
+            while(true){
+                ConsumerRecords<String, String> records = consumer.poll(100);
+                for(ConsumerRecord<String, String> record : records){
+                    System.out.printf("토픽 : %s, 파티션 : %s, 오프셋 : %s, 키 : %s, 밸류 : %s\n", record.topic(), record.partition(), record.offset(), record.key(), record.value());
+                }
             }
-            stopper = true;
+        } finally {
+            consumer.close();
         }
-
-    }//end of connectKafka
+    }//func
 
 
 
