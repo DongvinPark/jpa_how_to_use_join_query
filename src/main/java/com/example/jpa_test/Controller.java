@@ -368,13 +368,13 @@ public class Controller {
 
         log.info("레디스 컨트롤러 테스트 메서드 진입");
 
-        List<Long> pkIdListFromDataBase = new ArrayList<>();
+        /*List<Long> pkIdListFromDataBase = new ArrayList<>();
         pkIdListFromDataBase.add(1L);
         pkIdListFromDataBase.add(2L);
         pkIdListFromDataBase.add(3L);
 
         followeeCacheRepository.setFolloweeList(pkIdListFromDataBase, 0L);
-        System.out.println("레디스에서 팔로이 리스트 가져오기 컨트롤러 측 : " + followeeCacheRepository.getFolloweeList(0L));
+        System.out.println("레디스에서 팔로이 리스트 가져오기 컨트롤러 측 : " + followeeCacheRepository.getFolloweeList(0L));*/
 
         supportCacheRepository.setInitialSupport(5L);
         supportCacheRepository.plusOneSupport(5L);
