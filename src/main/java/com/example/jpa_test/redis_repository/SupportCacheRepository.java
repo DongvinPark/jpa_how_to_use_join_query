@@ -24,6 +24,7 @@ public class SupportCacheRepository {
 
     //임시로 3일이라 하자.
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
+    private static final Duration ZERO_DURATION = Duration.ZERO;
 
 
     //응원 숫자를 레디스로부터 가져온다.
@@ -46,9 +47,11 @@ public class SupportCacheRepository {
     public void plusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().getAndExpire(key, ZERO_DURATION);
 
         prevNumber++;
+
+        log.info("응원 추가 후 응원 숫자 : " + prevNumber);
 
         template.opsForValue().set(key, prevNumber, SUPPORT_NUMBER_DURATION);
         log.info("레디스에 응원숫자 +=1 누적 플러스 완료.");
@@ -58,9 +61,11 @@ public class SupportCacheRepository {
     public void minusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().get(key);
+        Long prevNumber = template.opsForValue().getAndExpire(key, ZERO_DURATION);
 
         prevNumber--;
+
+        log.info("응원 취소 후 응원 숫자 : " + prevNumber);
 
         template.opsForValue().set(key, prevNumber, SUPPORT_NUMBER_DURATION);
         log.info("레디스에 응원숫자 -=1 누적 마이너스 완료.");
