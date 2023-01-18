@@ -44,12 +44,12 @@ public class Controller {
         log.info("토픽에 메시지 보내기 완료. 토픽 컨슘 작업 시작");
 
         Properties propsConsume = new Properties();
-        props.put("bootstrap.servers","여기에 내 부트스트랩 문자열 넣어라");
-        props.put("group.id","peter-consumer");
-        props.put("enable.auto.commit","true");
-        props.put("auto.offset.reset","latest");
-        props.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        propsConsume.put("bootstrap.servers","여기에 내 부트스트랩 문자열 넣어라");
+        propsConsume.put("group.id","peter-consumer");
+        propsConsume.put("enable.auto.commit","true");
+        propsConsume.put("auto.offset.reset","latest");
+        propsConsume.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
+        propsConsume.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
 
         log.info("컨슘 프로퍼티 설정 완료");
 
