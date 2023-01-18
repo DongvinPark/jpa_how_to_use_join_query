@@ -35,11 +35,15 @@ public class SupportCacheRepository {
 
     //응원 숫자를 += 1 한다.
     public void plusOneSupport(Long publicTodoPKId){
+        log.info("응원 추가 진입");
+
         String key = getKey(publicTodoPKId);
 
         Long prevNumber = template.opsForValue().get(key);
 
         template.opsForHash().delete(key);
+
+        log.info("레디스 키 삭제 성공");
 
         prevNumber++;
 
@@ -51,11 +55,15 @@ public class SupportCacheRepository {
 
     //응원 숫자를 -= 1 한다.
     public void minusOneSupport(Long publicTodoPKId){
+        log.info("응원 마이너스 진입");
+
         String key = getKey(publicTodoPKId);
 
         Long prevNumber = template.opsForValue().get(key);
 
         template.opsForHash().delete(key);
+
+        log.info("레디스 키 삭제 성공");
 
         prevNumber--;
 
