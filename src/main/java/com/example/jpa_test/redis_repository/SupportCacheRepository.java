@@ -1,18 +1,8 @@
 package com.example.jpa_test.redis_repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.deser.DurationDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer;
-import java.io.Serializable;
 import java.time.Duration;
-import javax.persistence.EntityListeners;
-import javax.persistence.MappedSuperclass;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -24,7 +14,7 @@ public class SupportCacheRepository {
 
     //임시로 3일이라 하자.
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
-    private static final Duration ZERO_DURATION = Duration.ZERO;
+    private static final Duration NANO_DURATION = Duration.ofNanos(1L);
 
 
     //응원 숫자를 레디스로부터 가져온다.
@@ -47,7 +37,7 @@ public class SupportCacheRepository {
     public void plusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().getAndExpire(key, ZERO_DURATION);
+        Long prevNumber = template.opsForValue().getAndExpire(key, NANO_DURATION);
 
         prevNumber++;
 
@@ -61,7 +51,7 @@ public class SupportCacheRepository {
     public void minusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().getAndExpire(key, ZERO_DURATION);
+        Long prevNumber = template.opsForValue().getAndExpire(key, NANO_DURATION);
 
         prevNumber--;
 
