@@ -15,3 +15,21 @@ GET http://localhost:8080/join-run2
 
 ### entity set test run
 GET http://localhost:8080/entity-set-test-run
+
+
+
+
+### kafka new test
+POST http://localhost:8080/kafka-run?message=dongvinPark
+
+
+
+
+### kafka procucer
+GET http://localhost:8080/kafka-producer-run
+
+
+
+
+### kafka consumer
+GET http://localhost:8080/kafka-consumer-run
