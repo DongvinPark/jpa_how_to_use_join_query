@@ -29,7 +29,7 @@ public class Controller {
     @PostMapping("/peter-topic-produce")
     public void peterTopicSend(){
         Properties props = new Properties();
-        props.put("bootstrap.server", "여기에 내 부트스트랩 스트링 넣어라");
+        props.put("bootstrap.servers", "여기에 내 부트스트랩 스트링 넣어라");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
@@ -41,15 +41,9 @@ public class Controller {
         producer.send(new ProducerRecord<>("peter-topic", "셋"));
         producer.close();
 
-        log.info("토픽에 메시지 보내기 완료.");
-    }
+        log.info("토픽에 메시지 보내기 완료. 토픽 컨슘 작업 시작");
 
-
-
-
-    @GetMapping("/peter-topic-consume")
-    public void peterTopicReceive(){
-        Properties props = new Properties();
+        Properties propsConsume = new Properties();
         props.put("bootstrap.servers","여기에 내 부트스트랩 문자열 넣어라");
         props.put("group.id","peter-consumer");
         props.put("enable.auto.commit","true");
@@ -57,19 +51,31 @@ public class Controller {
         props.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
 
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+        log.info("컨슘 프로퍼티 설정 완료");
+
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(propsConsume);
         consumer.subscribe(Arrays.asList("peter-topic"));
 
         try{
+            log.info("메시지 확인 및 확인 하면서 해야 할 일 시작");
             while(true){
                 ConsumerRecords<String, String> records = consumer.poll(100);
                 for(ConsumerRecord<String, String> record : records){
+                    log.info("컨슈머 레코드 출력작업 진행");
                     System.out.printf("토픽 : %s, 파티션 : %s, 오프셋 : %s, 키 : %s, 밸류 : %s\n", record.topic(), record.partition(), record.offset(), record.key(), record.value());
                 }
             }
         } finally {
             consumer.close();
         }
+    }
+
+
+
+
+    @GetMapping("/peter-topic-run")
+    public void peterTopicReceive(){
+
     }//func
 
 
