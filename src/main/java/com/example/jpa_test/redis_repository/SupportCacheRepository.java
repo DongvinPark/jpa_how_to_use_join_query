@@ -37,7 +37,9 @@ public class SupportCacheRepository {
     public void plusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().getAndExpire(key, NANO_DURATION);
+        Long prevNumber = template.opsForValue().get(key);
+
+        template.opsForHash().delete(key);
 
         prevNumber++;
 
@@ -51,7 +53,9 @@ public class SupportCacheRepository {
     public void minusOneSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().getAndExpire(key, NANO_DURATION);
+        Long prevNumber = template.opsForValue().get(key);
+
+        template.opsForHash().delete(key);
 
         prevNumber--;
 
