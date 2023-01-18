@@ -61,7 +61,7 @@ public class RedisConfiguration {
     //Long 타입을 레디스에서 별도로 제공하지 않으므로 값 타입을 Object 타입으로 정의한다.
     //저장되는 값 타입이 Object일지라도, 레디스템플릿 자치에서 리스트 동작을 지원하기 때문에 값 부분 시리얼라이저가
     //리스트 관련 시리얼라이저일 필요는 없다.
-    @Bean
+    /*@Bean
     @Primary
     public RedisTemplate<String, Long> makeStringObjectListRedisTemplate(RedisConnectionFactory redisConnectionFactory){
         RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
@@ -70,11 +70,11 @@ public class RedisConfiguration {
         //Object는 객체타입이므로 new Jackson2JsonRedisSerializer<Long>(Long.class)를 사용한다.
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Long.class));
         return redisTemplate;
-    }
+    }*/
 
 
 
-    @Bean
+    /*@Bean
     @Primary
     public RedisTemplate<String, Object> makeStringRedisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
@@ -82,7 +82,7 @@ public class RedisConfiguration {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return redisTemplate;
-    }
+    }*/
 
 
 }

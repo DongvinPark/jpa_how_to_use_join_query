@@ -49,11 +49,7 @@ public class Controller {
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final TestRepository testRepository;
-
-    private final FolloweeCacheRepository followeeCacheRepository;
     private final JwtCacheRepository jwtCacheRepository;
-    private final NagCacheRepository nagCacheRepository;
-    private final SupportCacheRepository supportCacheRepository;
 
     /**
      * 본 코드는 두 개의 테이블을 조인하여 한 번의 쿼리로 작업을 끝내는 것과,
@@ -368,6 +364,8 @@ public class Controller {
 
         log.info("레디스 컨트롤러 테스트 메서드 진입");
 
+        //결과적으로 유저 JWT를 캐싱하는 것만 성공했다.
+
         /*List<Long> pkIdListFromDataBase = new ArrayList<>();
         pkIdListFromDataBase.add(1L);
         pkIdListFromDataBase.add(2L);
@@ -376,10 +374,10 @@ public class Controller {
         followeeCacheRepository.setFolloweeList(pkIdListFromDataBase, 0L);
         System.out.println("레디스에서 팔로이 리스트 가져오기 컨트롤러 측 : " + followeeCacheRepository.getFolloweeList(0L));*/
 
-        supportCacheRepository.setInitialSupport(5L);
+        /*supportCacheRepository.setInitialSupport(5L);
         supportCacheRepository.plusOneSupport(5L);
         supportCacheRepository.minusOneSupport(5L);
-        System.out.println("레디스에서 응원 개수 가져오기 컨트롤러 측 : " + supportCacheRepository.getSupportNumber(5L));
+        System.out.println("레디스에서 응원 개수 가져오기 컨트롤러 측 : " + supportCacheRepository.getSupportNumber(5L));*/
 
         jwtCacheRepository.setJwt("this is jwt", 7L);
         System.out.println("레디스에서 7L번 유저의 jwt 가져오기 컨트롤러 측 : " + jwtCacheRepository.getJwt(7L));
