@@ -16,6 +16,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +27,10 @@ public class Controller {
 
 
 
-    @PostMapping("/peter-topic-produce")
-    public void peterTopicSend(){
+    @PostMapping("/peter-topic-produce/{input}")
+    public void peterTopicSend(
+        @PathVariable String input
+    ){
         Properties props = new Properties();
         props.put("bootstrap.servers", "여기에 내 부트스트랩 스트링 넣어라");
         props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
@@ -36,13 +39,18 @@ public class Controller {
         log.info("샌드 프로퍼티 설정 완료");
 
         Producer<String, String> producer = new KafkaProducer<String, String>(props);
-        producer.send(new ProducerRecord<>("peter-topic", "하나"));
-        producer.send(new ProducerRecord<>("peter-topic", "둘"));
-        producer.send(new ProducerRecord<>("peter-topic", "셋"));
+        producer.send(new ProducerRecord<>("peter-topic", input));
         producer.close();
 
-        log.info("토픽에 메시지 보내기 완료. 토픽 컨슘 작업 시작");
+        log.info("토픽에 메시지 보내기 완료.");
 
+    }
+
+
+
+
+    @GetMapping("/peter-topic-consume")
+    public void peterTopicReceive(){
         Properties propsConsume = new Properties();
         propsConsume.put("bootstrap.servers","여기에 내 부트스트랩 문자열 넣어라");
         propsConsume.put("group.id","peter-consumer");
@@ -68,14 +76,6 @@ public class Controller {
         } finally {
             consumer.close();
         }
-    }
-
-
-
-
-    @GetMapping("/peter-topic-run")
-    public void peterTopicReceive(){
-
     }//func
 
 
