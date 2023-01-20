@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class Controller {
 
-
+    private final ServiceInstance serviceInstance;
 
     @PostMapping("/peter-topic-produce/{input}")
     public void peterTopicSend(
@@ -39,6 +39,10 @@ public class Controller {
     }
 
 
+    @GetMapping("/comsume-message")
+    public void cosumeStart(){
+        serviceInstance.work();
+    }
 
 }
 
