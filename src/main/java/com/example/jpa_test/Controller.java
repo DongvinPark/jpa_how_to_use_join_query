@@ -1,6 +1,7 @@
 package com.example.jpa_test;
 
 
+import com.example.jpa_test.kafka.producer.KafkaSingletonProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,36 +32,13 @@ public class Controller {
     public void peterTopicSend(
         @PathVariable String input
     ){
-        Properties props = new Properties();
-        props.put("bootstrap.servers", SecretValues.kafkaBootstrapServerAddr);
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-
-        log.info("샌드 프로퍼티 설정 완료");
-
-        Producer<String, String> producer = new KafkaProducer<String, String>(props);
+        Producer<String, String> producer = KafkaSingletonProducer.getSupportProducer();
         producer.send(new ProducerRecord<>(SecretValues.kafkaTopicName, input));
-        producer.close();
 
         log.info("토픽에 메시지 보내기 완료.");
-
     }
 
 
-
-
-    //----------- PRIVATE HELPER METHODS -----------
-
-
-
-
-
-    private void initList(List<Long> list){
-        for(long i=1; i<=5_000; i++){
-            list.add(i);
-        }
-        Collections.shuffle(list);
-    }//func
 
 }
 
