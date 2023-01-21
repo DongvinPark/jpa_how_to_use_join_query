@@ -10,26 +10,25 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class SupportCacheRepository {
-    private final RedisTemplate<String, Long> template;
+    private final RedisTemplate<String, String> template;
 
     //임시로 3일이라 하자.
     private static final Duration SUPPORT_NUMBER_DURATION = Duration.ofDays(3);
-    private static final Duration NANO_DURATION = Duration.ofNanos(1L);
 
 
     //응원 숫자를 레디스로부터 가져온다.
     public Long getSupportNumber(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
-        Long value = template.opsForValue().get(key);
+        String value = template.opsForValue().get(key);
         log.info("레디스로부터 응원 숫자 가져오기 완료.");
-        return value;
+        return Long.parseLong(value);
     }
 
 
     //최초의 응원에 대하여 캐싱한다.
     public void setInitialSupport(Long publicTodoPKId){
         String key = getKey(publicTodoPKId);
-        template.opsForValue().set(key, 1L, SUPPORT_NUMBER_DURATION);
+        template.opsForValue().set(key, "1", SUPPORT_NUMBER_DURATION);
         log.info("레디스에 응원숫자 최초 셋팅 완료.");
     }
 
@@ -39,38 +38,32 @@ public class SupportCacheRepository {
 
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().get(key);
+        String prevNumber = template.opsForValue().get(key);
 
-        template.opsForHash().delete(key);
+        System.out.println("응원 += 1 직전 숫자 : " + prevNumber);
 
-        log.info("레디스 키 삭제 성공");
+        template.opsForValue().increment(key);
 
-        prevNumber++;
+        log.info("응원 추가 후 응원 숫자 : " + template.opsForValue().get(key));
 
-        log.info("응원 추가 후 응원 숫자 : " + prevNumber);
-
-        template.opsForValue().set(key, prevNumber, SUPPORT_NUMBER_DURATION);
         log.info("레디스에 응원숫자 +=1 누적 플러스 완료.");
     }
 
     //응원 숫자를 -= 1 한다.
     public void minusOneSupport(Long publicTodoPKId){
-        log.info("응원 마이너스 진입");
+        log.info("응원 감소 진입");
 
         String key = getKey(publicTodoPKId);
 
-        Long prevNumber = template.opsForValue().get(key);
+        String prevNumber = template.opsForValue().get(key);
 
-        template.opsForHash().delete(key);
+        System.out.println("응원 += 1 직전 숫자 : " + prevNumber);
 
-        log.info("레디스 키 삭제 성공");
+        template.opsForValue().decrement(key);
 
-        prevNumber--;
+        log.info("응원 감소 후 응원 숫자 : " + template.opsForValue().get(key));
 
-        log.info("응원 취소 후 응원 숫자 : " + prevNumber);
-
-        template.opsForValue().set(key, prevNumber, SUPPORT_NUMBER_DURATION);
-        log.info("레디스에 응원숫자 -=1 누적 마이너스 완료.");
+        log.info("레디스에 응원숫자 -=1 누적 플러스 완료.");
     }
 
 

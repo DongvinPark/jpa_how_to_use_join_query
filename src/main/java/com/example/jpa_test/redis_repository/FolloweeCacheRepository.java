@@ -27,19 +27,19 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class FolloweeCacheRepository {
 
-    private final RedisTemplate<String, Object> template;
+    private final RedisTemplate<String, String> template;
 
     //이것은 값이 큰 편이므로 캐시에서 저장되는 유효기간을 짧게 설정한다.
     private static final Duration LIST_DURATION = Duration.ofDays(1);
-    private static final TimeUnit LIST_TIMEUNIT = TimeUnit.DAYS;
 
 
     //최초로 로그인 했다. DB로부터 특정 유저가 팔로우한 사람들의 주키 아이디 값 리스트를 받아서 레디스에 저장한다.
     //리스트에 더하는 작업은 5000번을 초과할 수 없다.
     public void setFolloweeList(List<Long> pkIdList, Long userPKId) throws JsonProcessingException {
-
         log.info("팔로이 리스트 셋팅 진입");
         String key = getKey(userPKId);
+
+        template.expire(key, LIST_DURATION);
 
         for(Long id : pkIdList){
             log.info("레디스 리스트 값 삽입 : " + id);
@@ -56,17 +56,12 @@ public class FolloweeCacheRepository {
 
         long size = template.opsForList().size(key);
 
-        List<Object> listFromRedis = template.opsForList().range(key, 0, size);
+        List<String> listFromRedis = template.opsForList().range(key, 0, size);
 
         log.info("레디스로부터 리스트 가져오기 완료. Expire 설정은 나중에한다.");
 
-        List<String> resultList = new ArrayList<>();
-        for( Object longObject : listFromRedis){
-            resultList.add((String) longObject);
-        }
-
         log.info("레디스로부터 팔로우 리스트 리턴 완료.");
-        return resultList;
+        return listFromRedis;
     }
 
 

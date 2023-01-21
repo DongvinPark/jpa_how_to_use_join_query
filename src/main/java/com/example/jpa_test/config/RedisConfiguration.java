@@ -57,34 +57,6 @@ public class RedisConfiguration {
     }
 
 
-    //특정 유저가 팔로우하고 있는 다른 유저들의 주키 아이디 값을 리스트 형태로 캐시하는 것에 쓰는 레디스 템플릿을 만든다.
-    //Long 타입을 레디스에서 별도로 제공하지 않으므로 값 타입을 Object 타입으로 정의한다.
-    //저장되는 값 타입이 Object일지라도, 레디스템플릿 자치에서 리스트 동작을 지원하기 때문에 값 부분 시리얼라이저가
-    //리스트 관련 시리얼라이저일 필요는 없다.
-    @Bean
-    @Primary
-    public RedisTemplate<String, Long> makeStringObjectListRedisTemplate(RedisConnectionFactory redisConnectionFactory){
-        RedisTemplate<String, Long> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        //Object는 객체타입이므로 new Jackson2JsonRedisSerializer<Long>(Long.class)를 사용한다.
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Long.class));
-        return redisTemplate;
-    }
-
-
-
-    @Bean
-    @Primary
-    public RedisTemplate<String, Object> makeStringRedisTemplate() {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
-        return redisTemplate;
-    }
-
-
 }
 
 
