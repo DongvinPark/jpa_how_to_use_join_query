@@ -7,8 +7,10 @@ public class ServiceInstance {
 
     public void work(){
         while(true){
-            System.out.println("메시지 큐 읽기");
-            System.out.println("메시지 큐 값 : " + MessageContainer.staticMessageQueue.pollFirst());
+            if(!MessageContainer.staticMessageQueue.isEmpty()){
+                System.out.println("메시지 큐 읽기");
+                System.out.println("메시지 큐 값 : " + MessageContainer.staticMessageQueue.pollFirst());
+            }
         }
     }
 
